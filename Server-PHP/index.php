@@ -10,54 +10,52 @@
     $host = "localhost";
     $dbUserName = "root";
     $dbPassword = "1234";
-    $dbName = "Members";
-
+    $dbName = "MemberDATA";
 
     // create connection 
-    $conn = new mysqli($host, $dbUserName, $dbPassword, $dbName);
-    
-    if(mysqli_connect_error()){
+    function handleConnectionToDB(){
+        $conn = new mysqli($host, $dbUserName, $dbPassword, $dbName);
 
-        die("Connection Error(".mysqli_connect_errno().")".mysqli_connect_error());
+        // check if i can connect otherwise spit out the error 
+        $checkConnection = mysqli_connect_error() ? die("Connection Error(".mysqli_connect_errno().")".mysqli_connect_error()):true;
+        
+        return checkConnection;
+    }
 
-    }else{
 
+    function handleUserSignIn(){
+
+        // Creating user account
         if(!empty($firstName)){
-            // User wants to Creating Account 
-
             $sql = "INSERT INTO MemberDetails (firstName, lastName, gender, state, email, password) values ('$firstName','$lastName','$gender','$state','$email','$password')";
 
-            
-            // $dbEmails = "SELECT * FROM MemberDetails WHERE (email='$email');";
-            // $results = mysql_query($conn,$dbEmails);
+            $dbEmails = "SELECT * FROM MemberDetails WHERE (email='$email');";
+            $results = mysql_query($conn,$dbEmails);
             // && mysql_num_rows($results) > 0)
+            echo $results;
 
             // Re-Check connection
             if($conn->query($sql)){
-              echo "Your account has been created";
-
-            // Set timeout here   
-              header("Location: /PHP/Website/Dashboard.html");
-              die();
-
-            }else{
-                echo "Something went wrong";  
+                echo "Your account has been created";
+            }else{ 
+                echo "Something wrong has happened to the database";  
             }
 
-        }else if(!empty($password)){
-            // User wants to Login
-            echo "Login in proccess";
+            //         // Set timeout here   
+            //   header("Location: /PHP/Website/Dashboard.html");
+            //   die();
 
-
+            // Logging in 
         }else{
-            header("Location: /PHP/Website/Login.html");
-            die();
+            echo "Login in proccess";
         }
-
-
     }
 
+    handleConnectionToDB();
+    handleUserSignIn();
+
 ?>
+
 
 
 
