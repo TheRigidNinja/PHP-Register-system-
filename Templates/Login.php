@@ -21,8 +21,6 @@
     <?php 
         $btnType = "Create Account"; 
         require("SubmitAction.php");
-
-        header("Location: ");
     ?>
 
 </form>

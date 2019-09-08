@@ -51,7 +51,10 @@
         <input type="password" placeholder="password" class="form-control" name="password" required>
     </div>
 
-    <?php $btnType = "Login"; require("SubmitAction")?>
+    <?php 
+        $btnType = "Login"; 
+        require("SubmitAction.php");
+    ?>
 
     <!-- <input type="submit" class="btn btn-outline-primary form-control text-center">
     <a class="btn btn-outline-primary form-control text-center" href="Login.php">Login</a> -->
