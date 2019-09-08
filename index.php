@@ -1,47 +1,59 @@
+<?php 
 
- <!-- <?php echo "Test" ?> -->
+    if(isset($_POST["submit"])){
+
+        // Requires To connect to DB
+        require("Config/db_connect.php");
+
+        $email =  mysqli_real_escape_string($conn, $_POST["email"]);
+        $password =  mysqli_real_escape_string($conn, $_POST["password"]);
+
+        // Writing queries
+        $sql = "SELECT * FROM members WHERE Email=$email";
+
+        // Make query & get result
+        $result = mysqli_query($conn, $sql);
+
+        // // fetch query 
+        // // $member = mysqli_fetch_assoc($result);
+
+        echo "<script>console.log('$result')</script>";
+
+        // // freeing / Closing connection
+        // mysqli_free_result($results);
+        // mysqli_close($conn);
+    }
+?>
+
 
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    <link rel="stylesheet" href="./CSS/loginForm.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css?family=Lobster&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-    </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-    </script>
-    <title>?</title>
-</head>
-
+<?php 
+    $titleName = "Login";
+    require("Templates/header.php");
+?>
 <body>
+    <form class="container form-group mx-auto d-flex flex-column align-items-center justify-content-center" action="<?php echo $_SERVER["PHP_SELF"]?>" method="POST">
+        <h1 class="h1 form-group">Login</h1>
+        <h2 class="h2 form-group">Exclusive Members Only</h2>
 
-    <?php 
+        <div class="input-group mb-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1"><i class="fa fa-envelope"></i></span>
+            </div>
+            <input type="email" class="form-control" placeholder="Email" name="email" required>
+        </div>
 
-        require("Templates/Login.php");
-        // require("Templates/CreateAccount.php");
-    ?>
 
+        <div class="input-group mb-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1"><i class="fas fa-key"></i></span>
+            </div>
+            <input type="password" placeholder="password" class="form-control" name="password" required>
+        </div>
+
+        <input type="submit" name="submit" value="submit" class="btn btn-outline-primary form-control text-center">
+        <a class="btn btn-outline-primary form-control text-center" href="./CreateAccount.php">Create Account</a>
+
+    </form>
 </body>
-
 </html>
-
-
-
-
-<!-- Proccess -->
-<!-- Install XAMPP -->
-
