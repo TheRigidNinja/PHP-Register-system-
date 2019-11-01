@@ -77,16 +77,13 @@
 
 
 <script>
-    var textmenu = $(".right_click");
+    var textmenu = $(".right_click"),
+    repoBoxElm = document.querySelectorAll(".repoBoxElm");
 
     // Handles Searching 
     function Search_input(data) {
-        console.log(data);
-
-        getPhpInfo({"filterSearch":data});
+        getPhpInfo({"filteredSearch":data});
     }
-
-    var repoBoxElm = document.querySelectorAll(".repoBoxElm");
 
     // Interacting with PHP
     function getPhpInfo(data){
@@ -96,16 +93,11 @@
             data: data,
             dataType: 'JSON',
             success: function (response) {
-
-                // Object.keys(response).forEach((element) => {
-                //     console.log(repoBoxElm[element]);
-                // });
-
-
-
-                // console.log(repoBoxElm);
-
-                // $("#repos").load(location.href + " #repos>*", "");
+                
+                Object.keys(response).forEach((element) => {
+                    repoBoxElm[element].classList.toggle("repoDisplayCls");
+                    // console.log(repoBoxElm[element].classList);
+                });
             }
         });
     }

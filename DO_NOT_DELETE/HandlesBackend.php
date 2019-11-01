@@ -4,7 +4,7 @@
 
     $repoIMG = array();
     $php_v = 5;
-    $directory = str_replace("DO_NOT_DELETE","",dirname(__FILE__))."/php$php_v";
+    $directory = str_replace("PHP-Repos-Browser\DO_NOT_DELETE","",dirname(__FILE__))."/php$php_v"; // Change this thing 
     $contextmenutype  = true;
     $_SESSION["folderNames"]  = array();
     $_SESSION["folderStamps"]  = array();
@@ -20,16 +20,16 @@
 
 
     
-    if(isset($_POST["filterSearch"])){
+    if(isset($_POST["filteredSearch"])){
 
-        function FilterSearch($word){
+        function filteredSearch($word){
             $cleanoutFname = preg_replace('/[^a-zA-Z]/', "", strtolower($word)); 
-            $cleanoutUserSearch = preg_replace('/[^a-zA-Z]/', "", strtolower($_POST["filterSearch"])); 
-
+            $cleanoutUserSearch = preg_replace('/[^a-zA-Z]/', "", strtolower($_POST["filteredSearch"])); 
+            
             return strstr($cleanoutFname,$cleanoutUserSearch);
         }
 
-        $_SESSION["filteredSearch"] = array_filter($_SESSION["folderNames"],"FilterSearch");
+        $_SESSION["filteredSearch"] = array_filter($_SESSION["folderNames"],"filteredSearch");
         echo json_encode($_SESSION["filteredSearch"]);
     }
 
