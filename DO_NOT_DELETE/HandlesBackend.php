@@ -4,7 +4,7 @@
 
     $repoIMG = array();
     $php_v = 5;
-    $directory = str_replace("PHP-Repos-Browser\DO_NOT_DELETE","",dirname(__FILE__))."/php$php_v"; // Change this thing 
+    $directory = str_replace("PHP-Repos-Browser/DO_NOT_DELETE","",dirname(__FILE__))."/php$php_v"; // Change this thing 
     $contextmenutype  = true;
     $_SESSION["folderNames"]  = array();
     $_SESSION["folderStamps"]  = array();
@@ -26,6 +26,7 @@
             $cleanoutFname = preg_replace('/[^a-zA-Z]/', "", strtolower($word)); 
             $cleanoutUserSearch = preg_replace('/[^a-zA-Z]/', "", strtolower($_POST["filteredSearch"])); 
             
+            echo $cleanoutFname, "-->", $cleanoutUserSearch;
             return strstr($cleanoutFname,$cleanoutUserSearch);
         }
 

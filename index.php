@@ -95,7 +95,8 @@
             success: function (response) {
                 
                 Object.keys(response).forEach((element) => {
-                    repoBoxElm[element].classList.toggle("repoDisplayCls");
+                    console.log(response);
+                    // repoBoxElm[element].classList.toggle("repoDisplayCls");
                     // console.log(repoBoxElm[element].classList);
                 });
             }
