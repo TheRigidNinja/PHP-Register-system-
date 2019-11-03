@@ -16,7 +16,10 @@
     <link rel="stylesheet" type="text/css" href="DO_NOT_DELETE/css/style.css" />
 </head>
 
-<body oncontextmenu="return true">
+<body oncontextmenu="return false">
+<input type="text" value="" id="clipboard"/>
+
+
     <!-- Body elements -->
     <div class="php-v_container">
         <span id="php-v"><?php echo "PHP - 5"?></span>
@@ -43,12 +46,12 @@
 
     <!-- All repos are displayed in here -->
     <section class="repos" id="repos">
-        
-        <?php foreach($_SESSION["filteredSearch"] as $name):?>
-            <a href="##" target="_black" class="repoBoxElm">
-                <div class="repoBox">
-                    <span class="tag is-warning is-medium"><?php echo $name; ?></span>
-                </div>
+        <div class="title notification is-danger repoDisplayCls">NOPE! 😞 Couldn't find it!</div>
+
+
+        <?php foreach($_SESSION["filtered_Search"] as $name):?>
+            <a href="##" target="_black" class="repoBox repoBoxElm">
+                <span class="tag is-warning is-medium"><?php echo $name; ?></span>
             </a>
         <?php  endforeach?>
     </section>
@@ -57,17 +60,17 @@
     <section class="right_click">
         <div class="dropdown-content">
             <?php if($contextmenutype):?>
-            <a href="#" class="dropdown-item"><strong>Open</strong></a>
-            <a href="#" class="dropdown-item">Open in BitBucket</a>
-            <a href="#" class="dropdown-item">Gallery</a>
-            <a href="#" class="dropdown-item">Banner</a>
-            <a href="#" class="dropdown-item">Copy Name</a>
+            <a href="#" class="dropdown-item" onclick="ContextmenuHandler('Open')"><strong>Open</strong></a>
+            <a href="#" class="dropdown-item" onclick="ContextmenuHandler('BitBucket')">Open in BitBucket</a>
+            <a href="#" class="dropdown-item" onclick="ContextmenuHandler('Gallery')">Gallery</a>
+            <a href="#" class="dropdown-item" onclick="ContextmenuHandler('Banner')">Banner</a>
+            <a href="#" class="dropdown-item" onclick="ContextmenuHandler('CopyName')">Copy Name</a>
             <hr class="dropdown-divider">
             <?php endif;?>
             <div class="divided">
                 <label class="dropdown-item"><strong>Open With:</strong></label>
-                <label class="radio dropdown-item"><input type="radio" name="openType" checked> VS Code</label>
-                <label class="radio dropdown-item"><input type="radio" name="openType"> PhpStorm</label>
+                <label class="radio dropdown-item"><input class="openwith" type="radio" value="code" name="openType" checked> VS Code</label>
+                <label class="radio dropdown-item"><input class="openwith" type="radio" value="phpStorm" name="openType"> PhpStorm</label>
             </div>
         </div>
     </section>
@@ -82,10 +85,14 @@
 
     // Handles Searching 
     function Search_input(data) {
-        getPhpInfo({"filteredSearch":data});
+        getPhpInfo({"filtered_Search":data});
     }
 
-    // Interacting with PHP
+    function Recents(){
+
+    }
+
+    // Interacting with PHP server at HandlesBackend
     function getPhpInfo(data){
         $.ajax({
             url: "DO_NOT_DELETE/HandlesBackend.php",
@@ -93,18 +100,63 @@
             data: data,
             dataType: 'JSON',
             success: function (response) {
-                
-                Object.keys(response).forEach((element) => {
-                    console.log(response);
-                    // repoBoxElm[element].classList.toggle("repoDisplayCls");
-                    // console.log(repoBoxElm[element].classList);
+
+                Object.keys(response["remove"]).forEach((element) => {
+                    repoBoxElm[element].classList.add("repoDisplayCls");
                 });
+
+                Object.keys(response["appear"]).forEach((element) => {
+                    repoBoxElm[element].classList.remove("repoDisplayCls");
+                });
+
+                // Add / Remove warning
+                if(response["appear"] == "" ){
+                    document.querySelector(".title").classList.remove("repoDisplayCls");
+                }else{
+                    document.querySelector(".title").classList.add("repoDisplayCls");
+                }
+
             }
         });
     }
 
 
+    // Handling Contextmenu
+    function ContextmenuHandler(type){
+        var openWith = document.querySelectorAll(".openwith"),
+        filename = document.querySelector("#clipboard").value;
+        openWith = openWith[0].checked?openWith[0].value:openWith[1].value;
 
+        // //
+        if(["BitBucket","CopyName"].includes(type)){
+            switch (type) {
+                case "BitBucket":
+                    var win = window.open("https://www.w3schools.com/jsref/met_win_open.asp", '_blank');
+                    win.focus();
+                break;
+                case "CopyName":
+                    var copyText = document.querySelector("#clipboard");
+                    copyText.select();
+                    document.execCommand("copy");
+                break;
+                default:
+                    break;
+            }
+        }else{
+            $.ajax({
+                url: "DO_NOT_DELETE/HandlesBackend.php",
+                method: 'POST',
+                data: {"ContextMenu":type,"openWith":openWith,"fileName":"\\"+filename},
+                dataType: 'JSON',
+                success: function (response) {
+                }
+            });
+        }
+    }
+
+
+
+    // Handling of Context Menu
     function Contextmenu(type, e) {
         // gets class for elment to make sure you're click on context menu
         var checkClass1 = e.target.parentNode.parentNode.getAttribute("class"),
@@ -115,13 +167,12 @@
             case type == "MouseDown":
                 textmenu.css({"left":(e.clientX - 10),"top":(e.clientY - 10),"display":"block"});
 
-                var getAttrP = e.target.getAttribute("class"),
-                    getAttrC = e.target.parentNode.getAttribute("class");
-
-                if (getAttrP === "repoBox" || getAttrC === "repoBox") {
-                    console.log(e.target);
-                }
+                // Writes to clipboard
+                var getvalueC = e.target.querySelector(".tag");
+                    getvalueP = getvalueC?getvalueC.innerHTML:e.target.innerHTML;
+                    document.querySelector("#clipboard").value = getvalueP;
                 break;
+
             case type == "Click" && (["divided", "dropdown-content", "right_click"].includes(checkClass1) || ["divided",
                 "dropdown-content", "right_click"
             ].includes(checkClass2) || ["divided", "dropdown-content", "right_click"].includes(checkClass3)):
@@ -136,16 +187,17 @@
     }
     
 
+    $(window).on("mousedown", (e) => {
+        if (e.button == 2) {
+            Contextmenu("MouseDown", e);
+        }
+    });
 
-    // $(window).on("mousedown", (e) => {
-    //     if (e.button == 2) {
-    //         Contextmenu("MouseDown", e);
-    //     }
-    // });
+    $(window).on("click", (e) => {
+        Contextmenu("Click", e);
+    });
 
-    // $(window).on("click", (e) => {
-    //     Contextmenu("Click", e);
-    // });
+
 </script>
 
 
