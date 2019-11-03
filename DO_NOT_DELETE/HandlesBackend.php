@@ -57,11 +57,11 @@
             break;
 
             case "Gallery":
-                system("cd ".$directory.$_POST["fileName"]."\gallery && start.");
+                system("cd ".$directory.$_POST["fileName"]."\gallery && start .");
             break;
 
             case "Banner":
-                system("cd ".$directory.$_POST["fileName"]."\banner && start.");
+                system("cd ".$directory.$_POST["fileName"]."\banner && start .");
             break;
         
             default:
