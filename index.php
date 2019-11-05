@@ -39,7 +39,7 @@
 
         <div class="nav-btn">
             <button class="button is-link is-rounded"><?php echo "Switch to PHP - 7"?></button>
-            <button class="button is-danger is-rounded" onclick="Recents()">Recents</button>
+            <button class="button is-danger is-rounded" onclick="Search_input('<!ORDER!>')">LATEST</button>
         </div>
     </section>
 
@@ -49,7 +49,7 @@
         <div class="title notification is-danger repoDisplayCls">NOPE! 😞 Couldn't find it!</div>
 
 
-        <?php foreach($_SESSION["filtered_Search"] as $name):?>
+        <?php foreach($filtered_Search as $name):?>
             <a href="##" target="_black" class="repoBox repoBoxElm">
                 <span class="tag is-warning is-medium"><?php echo $name; ?></span>
             </a>
@@ -88,10 +88,6 @@
         getPhpInfo({"filtered_Search":data});
     }
 
-    function Recents(){
-
-    }
-
     // Interacting with PHP server at HandlesBackend
     function getPhpInfo(data){
         $.ajax({
@@ -100,22 +96,40 @@
             data: data,
             dataType: 'JSON',
             success: function (response) {
+                if(data["filtered_Search"] === "<!ORDER!>"){
+                    var orderby = document.querySelector(".is-danger"),
+                    index_dir = -1;
+                    indexed_pos = 0;
 
-                Object.keys(response["remove"]).forEach((element) => {
-                    repoBoxElm[element].classList.add("repoDisplayCls");
-                });
+                    if(orderby.innerText == "LATEST"){
+                        orderby.innerText = "OLDEST";
+                        indexed_pos = response["index"].length;
+                        index_dir = 1;
+                    }else{
+                        orderby.innerText = "LATEST";
+                    }
 
-                Object.keys(response["appear"]).forEach((element) => {
-                    repoBoxElm[element].classList.remove("repoDisplayCls");
-                });
-
-                // Add / Remove warning
-                if(response["appear"] == "" ){
-                    document.querySelector(".title").classList.remove("repoDisplayCls");
+                    // Filter by LATEST or OLDEST edits 
+                    response["index"].forEach((element) => {
+                        repoBoxElm[element].style.order=(indexed_pos+=index_dir)+"";
+                    });
+                    
                 }else{
-                    document.querySelector(".title").classList.add("repoDisplayCls");
-                }
+                    Object.keys(response["remove"]).forEach((element) => {
+                        repoBoxElm[element].classList.add("repoDisplayCls");
+                    });
 
+                    Object.keys(response["appear"]).forEach((element) => {
+                        repoBoxElm[element].classList.remove("repoDisplayCls");
+                    });
+
+                    // Add / Remove warning
+                    if(response["appear"] == "" ){
+                        document.querySelector(".title").classList.remove("repoDisplayCls");
+                    }else{
+                        document.querySelector(".title").classList.add("repoDisplayCls");
+                    }
+                }
             }
         });
     }

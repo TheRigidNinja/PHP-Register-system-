@@ -1,26 +1,21 @@
 <?php 
 
     session_start();
-
-    $repoIMG = array();
     $php_v = 5;
-    $directory = str_replace("PHP-Repos-Browser\DO_NOT_DELETE","",dirname(__FILE__))."php$php_v"; // Change this thing 
+    $directory = str_replace("PHP-Repos-Browser/DO_NOT_DELETE","",dirname(__FILE__))."/php$php_v"; // Change this thing `
     $contextmenutype  = true;
-    $_SESSION["folderNames"]  = array();
-    $_SESSION["folderStamps"]  = array();
-    $_SESSION["filtered_Search"]  = array();
-
+    $folderNames = $folderStamps = $filter_by_recent = $filtered_Search = $repoIMG = $new_modified_order = []; 
 
     // Gets all folder/timestamps in the selected directory
     foreach (array_diff(scandir($directory), array('..', '.')) as $fname) {
-        array_push($_SESSION["folderNames"],$fname);
-        array_push($_SESSION["folderStamps"],stat($directory."/$fname")["atime"]);
+        array_push($folderNames,$fname);
+        array_push($folderStamps,stat($directory."/$fname")["atime"]);
     }
 
     // Assign foldernames 
-    $_SESSION["filtered_Search"] = $_SESSION["folderNames"];
+    $filtered_Search = $folderNames;
 
-    if(isset($_POST["filtered_Search"])){
+    if(isset($_POST["filtered_Search"]) && $_POST["filtered_Search"] != "<!ORDER!>"){
         // Function to check if the searched term exists in the array of foldernames
         // IF yes return the results otherwise return empty-> no results
         function filtered_Search($word){
@@ -31,21 +26,32 @@
             return strstr($clean_out_Fname,$clean_out_UserSearch);
         }
 
-        $search_results = array_filter($_SESSION["folderNames"],"filtered_Search");
+        $search_results = array_filter($folderNames,"filtered_Search");
 
         // Invert results --> So that i remove all resulted repos that don't match search term 
-        $_SESSION["filtered_Search"] =  array_diff($_SESSION["folderNames"], $search_results);
+        $filtered_Search =  array_diff($folderNames, $search_results);
 
         
         // If the search bar is empty display everything instead
         if(preg_replace('/[^a-zA-Z]/', "", strtolower($_POST["filtered_Search"])) == ""){
-            $search_results  = $_SESSION["filtered_Search"];
+            $search_results  = $filtered_Search;
         }; 
 
-        echo json_encode((object)["remove"=>$_SESSION["filtered_Search"],"appear"=>$search_results]);
+        echo json_encode((object)["remove"=>$filtered_Search,"appear"=>$search_results]);
+
+    }else if($_POST["filtered_Search"] == "<!ORDER!>"){
+        $new_modified_order = [];
+        $filter_by_recent = $folderStamps;
+        rsort($filter_by_recent);
+
+        // Filtering to most recent using modified dates
+        foreach ($filter_by_recent as $key) {
+          array_push($new_modified_order,array_search($key,$folderStamps));
+        }
+
+        // echo var_dump($filter_by_recent"]),"<====>", var_dump($folderStamps"]);
+        echo json_encode((object)["index"=>$new_modified_order,"obj"=>$folderNames]);
     }
-
-
 
 
     // Handles Context Menu
